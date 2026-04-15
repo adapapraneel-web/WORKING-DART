@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DevPath"/>
+<meta name="theme-color" content="#000000"/>
+<title>DevPath — Dart & Flutter Roadmap</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #f2f2f7;
+    --bg2: #ffffff;
+    --bg3: #e5e5ea;
+    --label: #000000;
+    --label2: #3c3c43cc;
+    --label3: #3c3c4399;
+    --sep: rgba(60,60,67,0.12);
+    --blue: #007aff;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --purple: #af52de;
+    --teal: #5ac8fa;
+    --yellow: #ffcc00;
+    --fill: rgba(120,120,128,0.12);
+    --fill2: rgba(120,120,128,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --bg2: #1c1c1e;
+      --bg3: #2c2c2e;
+      --label: #ffffff;
+      --label2: rgba(235,235,245,0.6);
+      --label3: rgba(235,235,245,0.3);
+      --sep: rgba(84,84,88,0.65);
+      --fill: rgba(120,120,128,0.2);
+      --fill2: rgba(120,120,128,0.12);
+    }
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--label);
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Nav bar */
+  .navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(242,242,247,0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--sep);
+    padding: env(safe-area-inset-top, 44px) 16px 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .navbar { background: rgba(0,0,0,0.85); }
+  }
+  .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+  .navbar-title { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
+  .navbar-back { font-size: 17px; color: var(--blue); display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 8px 0; }
+  .large-title { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; padding: 8px 20px 16px; }
+
+  /* Sections */
+  .section { margin: 0 0 32px; }
+  .section-header { font-size: 13px; font-weight: 400; color: var(--label2); text-transform: uppercase; letter-spacing: 0.4px; padding: 0 20px 8px; }
+  .section-body { background: var(--bg2); border-radius: 12px; margin: 0 16px; overflow: hidden; }
+
+  /* Rows */
+  .row {
+    display: flex; align-items: center; padding: 11px 16px; gap: 12px;
+    cursor: pointer; transition: background 0.15s; position: relative; min-height: 44px;
+  }
+  .row:not(:last-child)::after { content: ''; position: absolute; bottom: 0; left: 60px; right: 0; height: 0.5px; background: var(--sep); }
+  .row:active { background: var(--fill2); }
+
+  .row-icon {
+    width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; font-size: 17px; flex-shrink: 0;
+  }
+  .row-content { flex: 1; min-width: 0; }
+  .row-title { font-size: 17px; font-weight: 400; letter-spacing: -0.4px; }
+  .row-subtitle { font-size: 13px; color: var(--label2); margin-top: 1px; }
+  .row-right { display: flex; align-items: center; gap: 6px; }
+  .row-badge { font-size: 13px; color: var(--label2); }
+  .chevron { color: var(--label3); font-size: 14px; }
+  .checkmark { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .checkmark.done { background: var(--green); color: white; }
+  .checkmark.todo { border: 2px solid var(--sep); }
+
+  /* Progress */
+  .progress-card {
+    background: var(--bg2); border-radius: 16px; margin: 8px 16px 28px;
+    padding: 18px 20px; overflow: hidden; position: relative;
+  }
+  .progress-bar-track { background: var(--fill); border-radius: 999px; height: 6px; margin-top: 10px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--teal)); border-radius: 999px; transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+
+  /* Day detail */
+  .detail-scroll { padding: 0 0 40px; }
+  .detail-hero { padding: 20px 20px 8px; }
+  .day-badge { display: inline-block; background: var(--fill); padding: 4px 10px; border-radius: 999px; font-size: 13px; color: var(--label2); margin-bottom: 8px; }
+  .detail-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.15; }
+  .detail-week { font-size: 15px; color: var(--label2); margin-top: 4px; }
+
+  .detail-section { margin: 24px 16px 0; }
+  .detail-section-title { font-size: 13px; font-weight: 600; color: var(--label2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 4px; }
+  .detail-box { background: var(--bg2); border-radius: 12px; overflow: hidden; }
+  .detail-row { display: flex; align-items: flex-start; padding: 12px 16px; gap: 12px; position: relative; }
+  .detail-row:not(:last-child)::after { content: ''; position: absolute; bottom: 0; left: 16px; right: 0; height: 0.5px; background: var(--sep); }
+  .bullet { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .detail-text { font-size: 15px; line-height: 1.5; color: var(--label); }
+
+  .task-box { background: var(--blue); border-radius: 12px; padding: 16px; margin: 24px 16px 0; }
+  .task-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .task-text { font-size: 15px; color: white; line-height: 1.5; font-weight: 400; }
+
+  .yt-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border-radius: 12px; padding: 14px 16px;
+    margin: 24px 16px 0; cursor: pointer; text-decoration: none; color: var(--label);
+  }
+  .yt-icon { width: 36px; height: 36px; background: #ff0000; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .yt-text { flex: 1; }
+  .yt-title { font-size: 15px; font-weight: 500; }
+  .yt-sub { font-size: 13px; color: var(--label2); margin-top: 1px; }
+
+  .done-btn {
+    display: flex; align-items: center; justify-content: center;
+    margin: 24px 16px 0; height: 50px; border-radius: 12px; font-size: 17px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
+    font-family: inherit;
+  }
+
+  /* Week chips */
+  .week-chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 20px; scrollbar-width: none; }
+  .week-chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0; padding: 7px 16px; border-radius: 999px; font-size: 15px;
+    font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit;
+  }
+  .chip.active { color: white; }
+  .chip.inactive { background: var(--fill); color: var(--label2); }
+
+  /* Stat pills */
+  .stats { display: flex; gap: 10px; padding: 0 16px 24px; }
+  .stat-pill { flex: 1; background: var(--bg2); border-radius: 12px; padding: 14px 12px; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .stat-label { font-size: 12px; color: var(--label2); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="home-screen">
+  <div class="navbar">
+    <div class="navbar-inner">
+      <span style="font-size:22px">📱</span>
+      <span class="navbar-title">DevPath</span>
+      <span style="width:40px"></span>
+    </div>
+  </div>
+  <div class="large-title">My Roadmap</div>
+
+  <div class="progress-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:15px;color:var(--label2)">Overall Progress</div>
+        <div style="font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-top:2px" id="progress-pct">0%</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:28px;font-weight:700;letter-spacing:-0.5px" id="progress-count">0</div>
+        <div style="font-size:15px;color:var(--label2)">of 60 days</div>
+      </div>
+    </div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-pill">
+      <div class="stat-num" style="color:var(--blue)">60</div>
+      <div class="stat-label">Total Days</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-num" style="color:var(--orange)">2h</div>
+      <div class="stat-label">Per Day</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-num" style="color:var(--green)">1</div>
+      <div class="stat-label">App Shipped</div>
+    </div>
+  </div>
+
+  <div id="weeks-home"></div>
+</div>
+
+<!-- WEEK SCREEN -->
+<div class="screen" id="week-screen">
+  <div class="navbar">
+    <div class="navbar-inner">
+      <span class="navbar-back" onclick="showHome()">‹ Roadmap</span>
+      <span class="navbar-title" id="week-nav-title"></span>
+      <span style="width:80px"></span>
+    </div>
+  </div>
+  <div class="large-title" id="week-large-title"></div>
+  <div class="week-chips" id="week-chips"></div>
+  <div id="days-list"></div>
+</div>
+
+<!-- DAY SCREEN -->
+<div class="screen" id="day-screen">
+  <div class="navbar">
+    <div class="navbar-inner">
+      <span class="navbar-back" id="day-back-btn">‹ Week</span>
+      <span class="navbar-title" id="day-nav-title"></span>
+      <span style="width:80px"></span>
+    </div>
+  </div>
+  <div class="detail-scroll" id="day-detail"></div>
+</div>
+
+<script>
+const weeks = [
+  {
+    week:1, month:1, theme:"Dart Foundations", emoji:"🌱",
+    color:"#34c759", colorDark:"#30d158",
+    days:[
+      {day:1,title:"Setup & Hello World",topics:["Install VS Code + Dart extension","Install Dart SDK from dart.dev","Write your first print() statement","Run your first program"],task:"Print your name, age, and a fun fact about yourself in 3 separate lines",yt:{title:"Dart Setup & Hello World",q:"dart programming setup VS code hello world beginner 2024"}},
+      {day:2,title:"Variables & Data Types",topics:["String, int, double, bool types","var keyword — Dart infers the type","Declaring and assigning variables","Dart naming conventions (camelCase)"],task:"Create variables for a person's profile: name, age, height, isStudent, then print them all",yt:{title:"Dart Variables & Data Types",q:"dart variables data types tutorial beginner"}},
+      {day:3,title:"String Magic",topics:["String interpolation with $variable","String methods: length, toUpperCase, contains, trim","Multi-line strings with triple quotes","String concatenation with +"],task:"Build a sentence generator — user's name + age forms a full sentence using interpolation",yt:{title:"Dart String Methods",q:"dart string interpolation methods tutorial"}},
+      {day:4,title:"Numbers & Math",topics:["int vs double — when to use each","Basic operators: +, -, *, /, ~/","dart:math library: sqrt, pow, min, max","Remainder with %"],task:"Build a simple calculator that takes two numbers and prints add, subtract, multiply, divide results",yt:{title:"Dart Numbers & Math",q:"dart numbers math operators tutorial beginner"}},
+      {day:5,title:"Booleans & Conditions",topics:["true and false values","if / else if / else structure","Comparison: ==, !=, >, <, >=, <=","Logical: && (and), || (or), ! (not)"],task:"Build an age checker: prints different messages if user can vote, drive, or drink based on age",yt:{title:"Dart If Else Conditions",q:"dart if else conditions boolean tutorial"}},
+      {day:6,title:"Practice Day",topics:["Combine everything from days 1–5","Build without tutorials","Debug your own errors — this is key","Read your own code out loud"],task:"Build a full 'About Me' profile printer — uses variables, conditions, and string interpolation together",yt:{title:"Dart Beginner Practice",q:"dart beginner practice projects exercises"}},
+      {day:7,title:"Rest & Review",topics:["Rewatch one video that confused you","Read your own week 1 code","Write down 5 things you learned","Try explaining Dart to an imaginary friend"],task:"Write down 5 concepts from this week in plain English — no code, just your own words",yt:{title:"Dart Basics Full Review",q:"dart programming basics full course beginner"}},
+    ]
+  },
+  {
+    week:2, month:1, theme:"Control & Loops", emoji:"🔁",
+    color:"#007aff", colorDark:"#0a84ff",
+    days:[
+      {day:8,title:"Switch Statements",topics:["switch / case / default syntax","When switch beats if/else (multiple exact values)","break keyword — why it matters","Matching multiple cases"],task:"Build a day-of-week printer: input 1–7, prints Monday–Sunday using switch",yt:{title:"Dart Switch Statement",q:"dart switch case statement tutorial"}},
+      {day:9,title:"For Loops",topics:["Basic for loop: for(int i=0; i<n; i++)","Loop counter and why it starts at 0","Iterating a set number of times","Nested for loops — loop inside a loop"],task:"Print a full times table (1–10) for any number using a for loop",yt:{title:"Dart For Loops",q:"dart for loop tutorial beginner"}},
+      {day:10,title:"While & Do-While",topics:["while loop — checks condition first","do-while — runs at least once","Infinite loop danger and how to avoid it","break and continue keywords"],task:"Build a number guessing game — keep asking until user guesses correctly using while",yt:{title:"Dart While Loop",q:"dart while loop do while tutorial"}},
+      {day:11,title:"Lists",topics:["Creating lists: var items = []","Add, remove, access by index","Methods: add(), remove(), length, contains()","Looping over a list with for-in"],task:"Build a shopping list app — can add items, remove items, and display the full list",yt:{title:"Dart Lists Tutorial",q:"dart list array tutorial beginner"}},
+      {day:12,title:"Maps",topics:["Key-value pairs: var map = {}","Creating and accessing map values","Methods: keys, values, containsKey","Iterating over maps with forEach"],task:"Store a full person profile in a Map (name, age, city, job) and print each key-value pair",yt:{title:"Dart Maps Tutorial",q:"dart map tutorial key value pairs"}},
+      {day:13,title:"Practice Day",topics:["Combine lists, maps, and loops","Build something you'd actually use","Intentionally make errors and fix them","Read error messages carefully"],task:"Build a student grade tracker — stores names and grades in a Map, calculates class average",yt:{title:"Dart Lists Maps Practice",q:"dart lists maps loops practice project"}},
+      {day:14,title:"Rest & Review",topics:["Review all loop types","Rewrite a previous task using loops","Test yourself: write a loop without looking it up","Look up one thing you're still confused about"],task:"Rewrite your Week 1 About Me using a List and a for loop to print each fact",yt:{title:"Dart Control Flow Review",q:"dart loops conditions complete review"}},
+    ]
+  },
+  {
+    week:3, month:1, theme:"Functions & OOP", emoji:"🧩",
+    color:"#af52de", colorDark:"#bf5af2",
+    days:[
+      {day:15,title:"Functions Intro",topics:["Defining functions with void","Calling a function","Why functions exist — don't repeat yourself","Function naming (verb-based: getUser, printName)"],task:"Write 5 functions that each do one thing: greet, add, isEven, square, printLine",yt:{title:"Dart Functions Tutorial",q:"dart functions tutorial beginner"}},
+      {day:16,title:"Parameters & Return",topics:["Passing parameters into functions","Return types: int, String, bool, double","The return keyword","Functions with multiple parameters"],task:"Build a BMI calculator function: takes weight and height, returns BMI as double with a category string",yt:{title:"Dart Parameters Return Values",q:"dart function parameters return values tutorial"}},
+      {day:17,title:"Optional & Named Params",topics:["Named parameters with {}","Optional positional parameters with []","Default parameter values","required keyword for mandatory named params"],task:"Build a greet() function: required name, optional title (default 'Friend'), optional formal bool",yt:{title:"Dart Named Optional Parameters",q:"dart named optional parameters tutorial"}},
+      {day:18,title:"Classes & Objects",topics:["What is a class — a blueprint","Defining properties (fields) and methods","Creating an object with MyClass()","Accessing properties with dot notation"],task:"Create a Car class with brand, model, speed properties and a describe() method",yt:{title:"Dart Classes Objects OOP",q:"dart classes objects OOP tutorial beginner"}},
+      {day:19,title:"Constructors",topics:["Default constructor syntax","this keyword — refers to current object","Constructor shorthand (this.name)","Named constructors for multiple ways to create"],task:"Create a Person class with a constructor — make 3 different people and print their profiles",yt:{title:"Dart Constructors Tutorial",q:"dart constructor tutorial this keyword"}},
+      {day:20,title:"Inheritance",topics:["extends keyword — child inherits parent","super keyword — calls parent constructor","Overriding methods with @override","Is-A relationship concept"],task:"Create an Animal class, extend to Dog and Cat — each has unique sound() and sleep() methods",yt:{title:"Dart Inheritance Tutorial",q:"dart inheritance extends override tutorial"}},
+      {day:21,title:"Rest & Review",topics:["Review classes and functions","Rebuild a previous project using OOP","Watch an OOP explainer if still confused","Test: can you create a class from memory?"],task:"Rebuild your grade tracker from Day 13 as a proper class with methods — Student class, GradeBook class",yt:{title:"Dart OOP Review Practice",q:"dart object oriented programming practice project"}},
+    ]
+  },
+  {
+    week:4, month:1, theme:"Advanced Dart", emoji:"⚡",
+    color:"#ff9500", colorDark:"#ff9f0a",
+    days:[
+      {day:22,title:"Null Safety",topics:["Dart is null-safe by default","Nullable types with ? (String?)","Null-aware operator ?? (fallback value)","Null-aware access ?. (safe property access)","late keyword for late initialisation"],task:"Fix a program that crashes from a null value — use ?. and ?? to make it safe",yt:{title:"Dart Null Safety Tutorial",q:"dart null safety tutorial ?. ?? beginner"}},
+      {day:23,title:"Async & Futures",topics:["Why async matters — network, files, timers","Future<T> type — a value that will exist","async and await keywords","Future.delayed for fake async operations"],task:"Write a fake food recognition function using Future.delayed — 'scanning...' then returns ingredients",yt:{title:"Dart Async Await Future",q:"dart async await future tutorial beginner"}},
+      {day:24,title:"Error Handling",topics:["try / catch / finally blocks","throw keyword — create your own errors","Exception vs Error","When to handle vs when to let crash"],task:"Build a safe division function — catches divide by zero and returns a helpful message instead of crashing",yt:{title:"Dart Error Handling Try Catch",q:"dart try catch error handling exceptions"}},
+      {day:25,title:"Mixins & Interfaces",topics:["mixin keyword — share behaviour between classes","implements — force a class to have certain methods","abstract class — a class you can't instantiate","When to use each"],task:"Create a Flyable mixin with fly() method — apply it to both a Bird class and a Plane class",yt:{title:"Dart Mixins Interfaces Abstract",q:"dart mixins interfaces abstract class tutorial"}},
+      {day:26,title:"Enums & Generics",topics:["enum keyword — named constants","Using enums for app states: loading, success, error","Generic types <T> — type-safe reusable code","Where you see generics: List<String>, Future<int>"],task:"Create an enum for LoadingState and a generic swap() function that works with any type",yt:{title:"Dart Enums Generics Tutorial",q:"dart enums generics tutorial"}},
+      {day:27,title:"Functional Collections",topics:["List.where() — filter items","List.map() — transform each item","List.forEach() — run function on each","List.fold() — reduce to single value","Chaining methods"],task:"Take a list of 10 numbers: filter even ones, double them, and print the sum — using .where .map .fold",yt:{title:"Dart Functional Collections",q:"dart list where map fold functional methods"}},
+      {day:28,title:"Dart Final Boss 🏆",topics:["Build a complete Dart console app","Use everything from Month 1","No tutorials — just you and the docs","Debug like a real developer"],task:"Build a Dart quiz game: 5 questions, player types answers, tracks score, shows final grade with OOP",yt:{title:"Dart Complete Project Tutorial",q:"dart complete project beginner console app"}},
+    ]
+  },
+  {
+    week:5, month:2, theme:"Flutter Begins", emoji:"🦋",
+    color:"#5ac8fa", colorDark:"#64d2ff",
+    days:[
+      {day:29,title:"Flutter Setup",topics:["Install Flutter SDK from flutter.dev","Run flutter doctor — fix any issues","Set up Android emulator in Android Studio","Create first Flutter project — flutter create myapp"],task:"Get the default Flutter counter app running on your emulator. Change the title to your name.",yt:{title:"Flutter Installation Setup 2024",q:"flutter installation setup android emulator 2024 beginner"}},
+      {day:30,title:"Everything is a Widget",topics:["Flutter's core idea: everything is a widget","StatelessWidget vs StatefulWidget","The widget tree — parent contains children","Hot reload (Ctrl+S) — instant preview"],task:"Change the counter app: new colour, new title, change button text — explore without breaking it",yt:{title:"Flutter Widgets Explained",q:"flutter widgets explained stateless stateful beginner"}},
+      {day:31,title:"Basic Widgets",topics:["Text widget and its properties","Container — the box model of Flutter","Column (vertical) and Row (horizontal)","SizedBox for spacing, Center to centre"],task:"Build a profile card: your name, title, bio, all styled inside a Container with rounded corners",yt:{title:"Flutter Basic Widgets Column Row",q:"flutter column row container text basic widgets tutorial"}},
+      {day:32,title:"Styling & Themes",topics:["TextStyle — fontSize, fontWeight, color, letterSpacing","Colors class and hex with Color(0xFF...)","BoxDecoration — background, border, shadow, radius","ThemeData — set app-wide colours and fonts"],task:"Restyle your profile card to look premium: dark background, specific typography, subtle shadow",yt:{title:"Flutter Styling TextStyle BoxDecoration",q:"flutter textstyle boxdecoration theme tutorial"}},
+      {day:33,title:"Images & Icons",topics:["Image.network for URLs","Image.asset for local images","Icon widget with Icons.xxx","CircleAvatar for profile pictures"],task:"Add a profile picture (use a URL), an icon next to your name, and a badge with CircleAvatar",yt:{title:"Flutter Images Icons Tutorial",q:"flutter image network asset icon tutorial"}},
+      {day:34,title:"Buttons & Gestures",topics:["ElevatedButton, TextButton, IconButton","GestureDetector — detect any tap","onTap, onLongPress, onDoubleTap","InkWell — tap with ripple effect"],task:"Add a Follow button to your profile card — changes text and colour when tapped using StatefulWidget",yt:{title:"Flutter Buttons GestureDetector",q:"flutter buttons gesturedetector inkwell tutorial"}},
+      {day:35,title:"Rest & Review",topics:["Rebuild profile card without looking at code","Look through Flutter widget catalogue (docs.flutter.dev)","Try 3 new widgets you haven't used yet","Take note of which widgets confuse you"],task:"Rebuild the entire profile card from scratch — no copy pasting. Make it look better than the first version.",yt:{title:"Flutter Widget Review Practice",q:"flutter widget practice project beginners"}},
+    ]
+  },
+  {
+    week:6, month:2, theme:"Layouts & Navigation", emoji:"🗺️",
+    color:"#ff6b6b", colorDark:"#ff453a",
+    days:[
+      {day:36,title:"Scaffold & AppBar",topics:["Scaffold — the page skeleton","AppBar — title, leading, actions","Drawer for side menu","FloatingActionButton positioning"],task:"Build an app with a custom AppBar, a drawer with 3 menu items, and a FAB that shows a snackbar",yt:{title:"Flutter Scaffold AppBar Tutorial",q:"flutter scaffold appbar drawer tutorial"}},
+      {day:37,title:"ListView & Scrolling",topics:["ListView for vertical scrolling","ListView.builder — efficient for long lists","ListTile — built-in row with icon, title, subtitle","SingleChildScrollView for non-list scrolling"],task:"Build a scrollable list of 10 meals with a food emoji, name, and calorie count using ListView.builder",yt:{title:"Flutter ListView Builder Tutorial",q:"flutter listview builder listtile tutorial"}},
+      {day:38,title:"Stack & Positioned",topics:["Stack — overlapping widgets","Positioned — place widget at exact location","Using Stack for image overlays","Z-order — widgets drawn top to bottom"],task:"Build an image card with name and calories overlaid on a food image using Stack and Positioned",yt:{title:"Flutter Stack Positioned Tutorial",q:"flutter stack positioned widget tutorial"}},
+      {day:39,title:"Navigation Basics",topics:["Navigator.push() — go to new screen","Navigator.pop() — go back","MaterialPageRoute — the transition","Passing data to the next screen via constructor"],task:"Build 2 screens: meal list + meal detail. Tap a meal, opens detail with name and full info passed through.",yt:{title:"Flutter Navigation Push Pop",q:"flutter navigation push pop screens tutorial"}},
+      {day:40,title:"Named Routes",topics:["routes map in MaterialApp","Navigator.pushNamed() — navigate by name","Passing arguments with pushNamed","RouteSettings for receiving args"],task:"Convert your 2-screen app to named routes: '/home' and '/detail'. Pass meal data through route arguments.",yt:{title:"Flutter Named Routes Tutorial",q:"flutter named routes arguments tutorial"}},
+      {day:41,title:"Bottom Navigation Bar",topics:["BottomNavigationBar widget","Switching between screens with IndexedStack","Managing active tab with setState","Custom icons and labels"],task:"Build a 3-tab app: Home, Scan, Profile — exactly like Leanly's structure. Each tab shows different content.",yt:{title:"Flutter Bottom Navigation Bar",q:"flutter bottom navigation bar tutorial"}},
+      {day:42,title:"Rest & Review",topics:["Build a full mini app combining all week 6 skills","Practice navigation without looking at notes","Style the app with a consistent theme","Test on a real phone if possible"],task:"Build a recipe app: home list → tap recipe → detail screen with back button. Proper navigation, good UI.",yt:{title:"Flutter Navigation Practice App",q:"flutter navigation practice mini app project"}},
+    ]
+  },
+  {
+    week:7, month:2, theme:"State, APIs & Storage", emoji:"🔧",
+    color:"#34c759", colorDark:"#30d158",
+    days:[
+      {day:43,title:"setState Deep Dive",topics:["Understanding state — data that changes over time","When to use StatefulWidget","setState() — triggers a rebuild","Avoiding unnecessary rebuilds"],task:"Build a like button that toggles heart icon and counter — proper use of StatefulWidget and setState",yt:{title:"Flutter setState StatefulWidget",q:"flutter setstate statefulwidget tutorial"}},
+      {day:44,title:"Forms & Text Input",topics:["TextField widget and decoration","TextEditingController — read the typed value","Form widget + GlobalKey for validation","Keyboard types and input formatting"],task:"Build a login screen: email field, password field (hidden), submit button with basic validation",yt:{title:"Flutter Forms TextField Validation",q:"flutter textfield form validation tutorial"}},
+      {day:45,title:"Provider Basics",topics:["Why setState breaks down in larger apps","Install provider package in pubspec.yaml","ChangeNotifier class — notifies listeners","ChangeNotifierProvider and Consumer widgets"],task:"Move your like button logic into a LikeProvider class using Provider package",yt:{title:"Flutter Provider State Management",q:"flutter provider state management tutorial beginner"}},
+      {day:46,title:"HTTP & APIs",topics:["Install http package","GET request with http.get()","JSON parsing with jsonDecode()","Displaying real API data in a ListView"],task:"Fetch users from jsonplaceholder.typicode.com/users — display name, email, city in a styled ListView",yt:{title:"Flutter HTTP API Fetch",q:"flutter http api fetch json tutorial"}},
+      {day:47,title:"FutureBuilder",topics:["FutureBuilder widget — builds UI based on Future state","ConnectionState: waiting, done, error","Showing CircularProgressIndicator while loading","Handling error state gracefully"],task:"Add a proper loading spinner to your API screen — and an error message if the request fails",yt:{title:"Flutter FutureBuilder Tutorial",q:"flutter futurebuilder loading spinner tutorial"}},
+      {day:48,title:"Local Storage",topics:["shared_preferences package","Save String, int, bool to device storage","Load saved values when app starts","Use case: remember user name, dark mode, onboarding"],task:"Save the user's name on a settings screen — when app reopens, it loads and shows their name on home",yt:{title:"Flutter Shared Preferences Local Storage",q:"flutter shared preferences local storage tutorial"}},
+      {day:49,title:"Rest & Review",topics:["Build a notes app that combines all week 7 skills","Use forms to type a note, shared_preferences to save","Display saved notes in a ListView","Test that notes survive app restart"],task:"Build a notes app: type note → save → list all notes → notes still there when you reopen the app",yt:{title:"Flutter Notes App Project",q:"flutter notes app project tutorial state storage"}},
+    ]
+  },
+  {
+    week:8, month:2, theme:"Build & Ship 🚀", emoji:"🚀",
+    color:"#ff9500", colorDark:"#ff9f0a",
+    days:[
+      {day:50,title:"Firebase Setup",topics:["Create project on console.firebase.google.com","Add Flutter app using FlutterFire CLI","Install firebase_core package","Test Firebase connection works"],task:"Connect your Flutter app to Firebase. Console should show your app is active.",yt:{title:"Flutter Firebase Setup FlutterFire",q:"flutter firebase setup flutterfire cli 2024"}},
+      {day:51,title:"Firebase Auth",topics:["firebase_auth package","Email/password createUser and signIn","AuthStateChanges stream — listen to login state","Sign out and redirect to login screen"],task:"Build a full working login and signup screen connected to Firebase Auth",yt:{title:"Flutter Firebase Authentication",q:"flutter firebase authentication email password tutorial"}},
+      {day:52,title:"Firestore Database",topics:["cloud_firestore package","Add and read documents","Real-time updates with snapshots()","StreamBuilder to display live data"],task:"Save a user's meal log to Firestore. Display the list live — it updates instantly when you add one.",yt:{title:"Flutter Firestore Database Tutorial",q:"flutter firestore database read write tutorial"}},
+      {day:53,title:"Camera & Image Picker",topics:["image_picker package","Open camera vs photo gallery","Display selected image with Image.file","Handle permissions on Android and iOS"],task:"Add a camera button that takes a photo and displays it on screen — foundation of Leanly's fridge scanner",yt:{title:"Flutter Camera Image Picker",q:"flutter camera image picker tutorial"}},
+      {day:54,title:"Polish & Animation",topics:["AnimatedContainer — smooth size/colour changes","Hero animation — shared element transition between screens","PageRouteBuilder for custom transitions","Opacity and FadeTransition"],task:"Add Hero animation between meal list and detail screen — image flies across screens smoothly",yt:{title:"Flutter Animations Hero Tutorial",q:"flutter animations hero transition tutorial"}},
+      {day:55,title:"App Icon & Splash Screen",topics:["flutter_launcher_icons package","splash_screen_view or native splash","Setting app name in AndroidManifest.xml","Remove debug banner: debugShowCheckedModeBanner: false"],task:"Give your app a real icon and name. Remove the debug banner. It should look like a real app.",yt:{title:"Flutter App Icon Splash Screen",q:"flutter app icon splash screen tutorial 2024"}},
+      {day:56,title:"Build for Android",topics:["flutter build apk (debug)","flutter build apk --release","Signing your app with a keystore","Install APK directly on your real phone"],task:"Build a release APK and install it on your actual Android phone. Share it with one friend.",yt:{title:"Flutter Build APK Android Release",q:"flutter build apk release android tutorial"}},
+      {day:57,title:"Final App — Day 1",topics:["Set up your actual app project (Leanly or Dartwise)","Create folder structure: screens, models, services","Build the home screen UI","Set up navigation skeleton"],task:"Home screen built and looking clean. Navigation shell with bottom bar working.",yt:{title:"Flutter App Architecture Setup",q:"flutter app folder structure architecture setup"}},
+      {day:58,title:"Final App — Day 2",topics:["Build screen 2 fully","Wire up navigation between all screens","Add real data (not placeholder text)","Test on emulator"],task:"At least 2 screens working with real navigation and real content.",yt:{title:"Flutter Multi Screen App Tutorial",q:"flutter multi screen navigation data passing"}},
+      {day:59,title:"Final App — Day 3",topics:["Add core feature (fridge scan or quiz questions)","Connect any API or Firebase you need","Polish UI — spacing, colours, typography","Fix every bug you can find"],task:"Core feature of your app works. UI looks intentional and clean.",yt:{title:"Flutter App Polish UI Tips",q:"flutter app UI polish tips clean design"}},
+      {day:60,title:"SHIP IT 🎉",topics:["Final bug fixes and testing","Submit to Google Play Console","Post about it online","Celebrate — you went from zero to shipped"],task:"Submit your app to Google Play. You are no longer a beginner. You are a developer.",yt:{title:"Flutter Publish Google Play Store",q:"flutter publish google play store tutorial 2024"}},
+    ]
+  },
+];
+
+// State
+let completed = JSON.parse(localStorage.getItem('devpath_done') || '[]');
+let currentWeek = 0;
+let currentDay = null;
+
+function saveCompleted() {
+  localStorage.setItem('devpath_done', JSON.stringify(completed));
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = weeks.reduce((a,w) => a + w.days.length, 0);
+  const done = completed.length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-count').textContent = done;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function isDone(dayNum) { return completed.includes(dayNum); }
+
+function toggleDone(dayNum, e) {
+  if(e) e.stopPropagation();
+  if(isDone(dayNum)) { completed = completed.filter(d => d !== dayNum); }
+  else { completed.push(dayNum); }
+  saveCompleted();
+  if(currentDay !== null) renderDayDetail(currentDay);
+  renderDaysList();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showHome() {
+  renderHomeWeeks();
+  updateProgress();
+  showScreen('home-screen');
+}
+
+function showWeek(wi) {
+  currentWeek = wi;
+  const w = weeks[wi];
+  document.getElementById('week-nav-title').textContent = 'Week ' + w.week;
+  document.getElementById('week-large-title').textContent = w.emoji + ' ' + w.theme;
+  renderWeekChips(wi);
+  renderDaysList();
+  showScreen('week-screen');
+}
+
+function showDay(di) {
+  currentDay = di;
+  renderDayDetail(di);
+  showScreen('day-screen');
+}
+
+function renderHomeWeeks() {
+  const container = document.getElementById('weeks-home');
+  container.innerHTML = weeks.map((w,wi) => {
+    const doneDays = w.days.filter(d => isDone(d.day)).length;
+    const total = w.days.length;
+    return `
+    <div class="section">
+      <div class="section-header">Month ${w.month} · Week ${w.week}</div>
+      <div class="section-body">
+        <div class="row" onclick="showWeek(${wi})">
+          <div class="row-icon" style="background:${w.color}22">${w.emoji}</div>
+          <div class="row-content">
+            <div class="row-title">${w.theme}</div>
+            <div class="row-subtitle">${doneDays}/${total} days complete</div>
+          </div>
+          <div class="row-right">
+            <div class="row-badge" style="color:${doneDays===total?w.color:'var(--label3)'}">${doneDays===total?'✓':doneDays+'/'+total}</div>
+            <span class="chevron">›</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderWeekChips(activeWi) {
+  const container = document.getElementById('week-chips');
+  container.innerHTML = weeks.map((w,wi) => {
+    const isActive = wi === activeWi;
+    return `<button class="chip ${isActive?'active':'inactive'}" style="${isActive?'background:'+w.color:''}; color:${isActive?'#fff':''}" onclick="showWeek(${wi})">${w.emoji} W${w.week}</button>`;
+  }).join('');
+}
+
+function renderDaysList() {
+  const w = weeks[currentWeek];
+  const container = document.getElementById('days-list');
+  container.innerHTML = `
+    <div class="section">
+      <div class="section-header">${w.days.filter(d=>isDone(d.day)).length} of ${w.days.length} days complete</div>
+      <div class="section-body">
+        ${w.days.map((d,di) => `
+          <div class="row" onclick="showDay(${di})">
+            <div class="checkmark ${isDone(d.day)?'done':'todo'}" onclick="toggleDone(${d.day}, event)">
+              ${isDone(d.day)?'✓':''}
+            </div>
+            <div class="row-content">
+              <div class="row-title" style="color:${isDone(d.day)?'var(--label3)':'var(--label)'}">${d.title}</div>
+              <div class="row-subtitle">Day ${d.day} · ${d.topics.length} topics</div>
+            </div>
+            <span class="chevron">›</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function renderDayDetail(di) {
+  const w = weeks[currentWeek];
+  const d = w.days[di];
+  const done = isDone(d.day);
+  const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(d.yt.q)}`;
+
+  document.getElementById('day-nav-title').textContent = 'Day ' + d.day;
+  document.getElementById('day-back-btn').onclick = () => showWeek(currentWeek);
+
+  document.getElementById('day-detail').innerHTML = `
+    <div class="detail-hero">
+      <div class="day-badge">Day ${d.day} of 60</div>
+      <div class="detail-title">${d.title}</div>
+      <div class="detail-week">${w.emoji} Week ${w.week}: ${w.theme}</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">📚 What to learn today</div>
+      <div class="detail-box">
+        ${d.topics.map(t => `
+          <div class="detail-row">
+            <div class="bullet" style="background:${w.color}"></div>
+            <div class="detail-text">${t}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="task-box" style="background:${w.color}">
+      <div class="task-label">🎯 Daily Task</div>
+      <div class="task-text">${d.task}</div>
+    </div>
+
+    <a class="yt-btn" href="${ytUrl}" target="_blank">
+      <div class="yt-icon">▶</div>
+      <div class="yt-text">
+        <div class="yt-title">${d.yt.title}</div>
+        <div class="yt-sub">Search on YouTube →</div>
+      </div>
+    </a>
+
+    <div style="margin:24px 16px 0;display:flex;gap:10px">
+      ${di > 0 ? `<button onclick="showDay(${di-1})" style="flex:1;height:50px;border-radius:12px;background:var(--fill);border:none;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;color:var(--label)">← Prev</button>` : '<div style="flex:1"></div>'}
+      <button class="done-btn" onclick="toggleDone(${d.day})" style="flex:2;background:${done?'var(--fill)':w.color};color:${done?'var(--label2)':'white'}">
+        ${done ? '✓ Completed' : 'Mark Complete'}
+      </button>
+      ${di < w.days.length-1 ? `<button onclick="showDay(${di+1})" style="flex:1;height:50px;border-radius:12px;background:var(--fill);border:none;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;color:var(--label)">Next →</button>` : '<div style="flex:1"></div>'}
+    </div>
+    <div style="height:40px"></div>
+  `;
+}
+
+// Init
+renderHomeWeeks();
+updateProgress();
+</script>
+</body>
+</html>
